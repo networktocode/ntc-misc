@@ -88,7 +88,7 @@ After connecting to the DevNet sandbox lab environment, connect to your Linux de
 Now execute the Ansible playbook as follows:
 
 ```
-(python2) [root@localhost poap]# ansible-playbook --ask-pass devbox_dhcp_setup.yml 
+(python2) [root@localhost poap]# ansible-playbook   devbox_dhcp_setup.yml 
 ```
 
 After the playbook executes, the file `/etc/dhcp/dhcpd.conf` will be
@@ -140,7 +140,7 @@ As we stated previously, once the DHCP process is complete, the switch will have
 In the same directory you executed the playbook to install and setup DHCP, now execute the following Ansible command to install and setup TFTP:
 
 ```
-(python2) [root@localhost poap]# ansible-playbook --ask-pass devbox_tftp_setup.yml
+(python2) [root@localhost poap]# ansible-playbook   devbox_tftp_setup.yml
 ```
 
 
@@ -192,7 +192,7 @@ The first step is to install the dependencies required for the POAP server.  Thi
 
 
 ```
-(python2) [root@localhost poap]# ansible-playbook --ask-pass devbox_poap_reqs.yml
+(python2) [root@localhost poap]# ansible-playbook   devbox_poap_reqs.yml
 ```
 
 
