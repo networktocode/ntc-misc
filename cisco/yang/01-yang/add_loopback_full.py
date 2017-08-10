@@ -72,7 +72,7 @@ def main():
             new_ip = add_ip_interface.format(LOOPBACK_IP[device]['loopback'], LOOPBACK_IP[device]['ip'])
             netconf_response = m.edit_config(target='running', config=new_ip)
             # Parse the XML response
-            print(netconf_response)
+            print(etree.tostring(netconf_response.data, pretty_print=True))
                 
 
 if __name__ == '__main__':

@@ -57,8 +57,7 @@ def main():
             new_prefix = add_prefix.format(PREFIX[device])
             netconf_response = m.edit_config(target='running', config=new_prefix)
             # Parse the XML response
-            
-            print(netconf_response)
+            print(etree.tostring(netconf_response.data, pretty_print=True))
 
 
 if __name__ == '__main__':

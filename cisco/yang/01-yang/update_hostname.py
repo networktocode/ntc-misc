@@ -35,7 +35,7 @@ def main():
         # Update the running config
         netconf_response = m.edit_config(target='running', config=new_name)
         # Parse the XML response
-        print(netconf_response)
+        print(etree.tostring(netconf_response.data, pretty_print=True))
             
 
                 
