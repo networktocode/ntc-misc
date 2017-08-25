@@ -62,7 +62,7 @@ Finally, three agent packages are available: NETCONF, RESTConf and gRPC. At leas
 Login to the devbox to download the necessary packages. Run the following ansible playbook from the `yang-prereqs` directory:
 
 ``` shell
-(python2) [root@localhost sbx_nxos]# cd /root/sbx_nxos/yang/yang-prereqs
+(python2) [root@localhost sbx_nxos]# cd /root/sbx_nxos/learning_labs/yang/yang-prereqs
 (python2) [root@localhost yang-prereqs]# ansible-playbook get_rpms.yml
 PLAY [ENSURE THAT THE NXOS RPMS ARE AVAILABLE] *********************************
 
@@ -87,12 +87,12 @@ PLAY RECAP *********************************************************************
 
 ```
 
-This playbook creates a directory `/root/sbx_nxos/yang/nxos_rpms/` and downloads the required software.
+This playbook creates a directory `/root/sbx_nxos/learning_labs/yang/nxos_rpms/` and downloads the required software.
 
 Take a look by navigating within the devbox.
 
 ``` shell
-(python2) [root@localhost ~]# cd /root/sbx_nxos/yang/nxos_rpms/
+(python2) [root@localhost ~]# cd /root/sbx_nxos/learning_labs/yang/nxos_rpms/
 (python2) [root@localhost nxos_rpms]# 
 (python2) [root@localhost nxos_rpms]# ls -l
 total 64272
@@ -114,13 +114,13 @@ You'll be using SCP to copy the files from the devbox directly to each switch.
 
 ### Copy the programmable interface infrastructure packages:
 
-nx-osv9000-1#copy scp://root@10.10.20.20/root/sbx_nxos/yang/nxos_rpms/mtx-device-7_0_3_I6_1.1.0.0-r1705191346.x86_64.rpm bootflash: vrf management
+nx-osv9000-1#copy scp://root@10.10.20.20/root/sbx_nxos/learning_labs/yang/nxos_rpms/mtx-device-7_0_3_I6_1.1.0.0-r1705191346.x86_64.rpm bootflash: vrf management
 
-nx-osv9000-1#copy scp://root@10.10.20.20/root/sbx_nxos/yang/nxos_rpms/mtx-infra-1.0.0-r1705191346.x86_64.rpm bootflash: vrf management
+nx-osv9000-1#copy scp://root@10.10.20.20/root/sbx_nxos/learning_labs/yang/nxos_rpms/mtx-infra-1.0.0-r1705191346.x86_64.rpm bootflash: vrf management
 
 # Copy the NETCONF agent package
 
-nx-osv9000-1#copy scp://root@10.10.20.20/root/sbx_nxos/yang/nxos_rpms/mtx-netconf-agent-1.0.1-r1705191346.x86_64.rpm bootflash: vrf management
+nx-osv9000-1#copy scp://root@10.10.20.20/root/sbx_nxos/learning_labs/yang/nxos_rpms/mtx-netconf-agent-1.0.1-r1705191346.x86_64.rpm bootflash: vrf management
 
 ```
 
@@ -341,7 +341,7 @@ We will use `pyang` as a learning tool to help visualize the YANG models for thi
 We will now install `ncclient` and `pyang`. Navigate to the `yang-prereqs` directory
 
 ``` shell
-(python2) [root@localhost nxos_rpms]# cd /root/sbx_nxos/yang/yang-prereqs
+(python2) [root@localhost nxos_rpms]# cd /root/sbx_nxos/learning_labs/yang/yang-prereqs
 (python2) [root@localhost yang-prereqs]#
 ```
 Execute pip to install the requirements
@@ -385,11 +385,11 @@ When we installed the **mtx-device** package on the switches, it installed the C
 
 In this section we will use the `ncclient` library and Python scripts to interact with the NETCONF agent, running on the switches, using XML data that adheres to the NXOS YANG model. 
 
-Open a new terminal session to the devbox and navigate to the to the `/root/sbx_nxos/yang/01-yang` directory:
+Open a new terminal session to the devbox and navigate to the to the `/root/sbx_nxos/learning_labs/yang/01-yang` directory:
 
 
 ``` shell
-(python2) [root@localhost yang]# cd /root/sbx_nxos/yang/01-yang/
+(python2) [root@localhost yang]# cd /root/sbx_nxos/learning_labs/yang/01-yang/
 (python2) [root@localhost 01-yang]# ls -l
 total 28
 -rw-r--r--. 1 root root 2207 Aug  4 18:49 add_loopback_full.py
@@ -488,7 +488,7 @@ First, it's worth noting that all supported models for Nexus are posted to GitHu
 On the devbox, navigate to the `yang` directory and clone this repository:
 
 ``` shell
-(python2) [root@localhost yang]# cd /root/sbx_nxos/yang
+(python2) [root@localhost yang]# cd /root/sbx_nxos/learning_labs/yang
 (python2) [root@localhost yang]# git clone https://github.com/YangModels/yang
 Cloning into 'yang'...
 remote: Counting objects: 8057, done.
@@ -834,7 +834,7 @@ First, collect the YANG definition for loopback interface and write to a file:
 
 ``` 
 
-(python2) [root@localhost 7.0-3-I6-1]# cd /root/sbx_nxos/yang/yang/vendor/cisco/nx/7.0-3-I6-1
+(python2) [root@localhost 7.0-3-I6-1]# cd /root/sbx_nxos/learning_labs/yang/yang/vendor/cisco/nx/7.0-3-I6-1
 (python2) [root@localhost 7.0-3-I6-1]# pyang -f tree --tree-path="/System/intf-items/lb-items" Cisco-NX-OS-device.yang" Cisco-NX-OS-device.yang  -o /tmp/nxos_lbintf.txt
 # output omitted
 
@@ -910,7 +910,7 @@ add_lbintf = """
 Navigate back to the `01-yang` directory:
 
 ```
-(python2) [root@localhost 01-yang]# cd /root/sbx_nxos/yang/01-yang
+(python2) [root@localhost 01-yang]# cd /root/sbx_nxos/learning_labs/yang/01-yang
 
 ```
 

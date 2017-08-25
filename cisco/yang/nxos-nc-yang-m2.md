@@ -21,7 +21,7 @@ The lab exercises in part 2 have dependencies from part 1. If you are working on
 Navigate to the `yang-prereqs` directory:
 
 ```shell
-(python2) [root@localhost sbx_nxos]# cd /root/sbx_nxos/yang/yang-prereqs/
+(python2) [root@localhost sbx_nxos]# cd /root/sbx_nxos/learning_labs/yang/yang-prereqs/
 (python2) [root@localhost yang-prereqs]#
 ```
 
@@ -99,7 +99,7 @@ PLAY RECAP *********************************************************************
 Finally, navigate to the `01-yang` directory and execute the loopback creation script. This will add interfaces `loopback101` and `loopback102` on `nx-osv9000-1` and `nx-osv9000-2` respectively.
 
 ``` shell
-(python2) [root@localhost yang-prereqs]# cd /root/sbx_nxos/yang/01-yang
+(python2) [root@localhost yang-prereqs]# cd /root/sbx_nxos/learning_labs/yang/01-yang
 
 (python2) [root@localhost 01-yang]# python add_loopback_full.py 
 
@@ -390,7 +390,7 @@ As in Part 1, you will use `pyang` to visualize the BGP elements within the NXOS
 Navigate to the directory containing the YANG models (this was a Git clone in Part 1):
 
 ``` shell
-(python2) [root@localhost 7.0-3-I6-1]# cd /root/sbx_nxos/yang/yang/vendor/cisco/nx/7.0-3-I6-1
+(python2) [root@localhost 7.0-3-I6-1]# cd /root/sbx_nxos/learning_labs/yang/yang/vendor/cisco/nx/7.0-3-I6-1
 
 ```
 
@@ -484,12 +484,12 @@ asn_filter = """
 
 Let's execute a script that'll query the device for two of the Nexus switches.
 
-First, navigate to the sample code directory for `02-yang` using the command `cd /root/sbx_nxos/yang/02-yang`.  You'll see a script called `get_bgp_asn.py` in this directory.
+First, navigate to the sample code directory for `02-yang` using the command `cd /root/sbx_nxos/learning_labs/yang/02-yang`.  You'll see a script called `get_bgp_asn.py` in this directory.
 
 Execute the `get_bgp_asn.py` script.
 
 ``` 
-(python2) [root@localhost 02-yang]# cd /root/sbx_nxos/yang/02-yang
+(python2) [root@localhost 02-yang]# cd /root/sbx_nxos/learning_labs/yang/02-yang
 (python2) [root@localhost 02-yang]# python get_bgp_asn.py 
 The ASN number for (nx-osv9000-1) 172.16.30.101 is 65531
 The ASN number for (nx-osv9000-2) 172.16.30.102 is 65532
@@ -540,10 +540,10 @@ In Part 1, you added interfaces `loopback 101` and  `loopback 102` to switches *
 
 Use the `pyang` `tree-path` again to visualize the model for BGP prefixes.
 
-Ensure you're in the `/root/sbx_nxos/yang/yang/vendor/cisco/nx/7.0-3-I6-1/`  directory:
+Ensure you're in the `/root/sbx_nxos/learning_labs/yang/yang/vendor/cisco/nx/7.0-3-I6-1/`  directory:
 
 ``` shell
-(python2) [root@localhost 01-yang]# cd /root/sbx_nxos/yang/yang/vendor/cisco/nx/7.0-3-I6-1/
+(python2) [root@localhost 01-yang]# cd /root/sbx_nxos/learning_labs/yang/yang/vendor/cisco/nx/7.0-3-I6-1/
 (python2) [root@localhost 7.0-3-I6-1]# 
 
 ```
@@ -617,7 +617,7 @@ This will advertise each device's Loopback address via BGP.
 
 
 ``` 
-(python2) [root@localhost 7.0-3-I6-1]# cd /root/sbx_nxos/yang/02-yang
+(python2) [root@localhost 7.0-3-I6-1]# cd /root/sbx_nxos/learning_labs/yang/02-yang
 (python2) [root@localhost 02-yang]# python add_nxos_bgp_prefixes.py 
 
 Now adding prefix 10.101.1.0/24 to device (nx-osv9000-1) 172.16.30.101..

@@ -24,7 +24,7 @@ The lab exercises in part 3 have dependencies from part 1. If you are working on
 Navigate to the `yang-prereqs` directory:
 
 ```shell
-(python2) [root@localhost sbx_nxos]# cd /root/sbx_nxos/yang/yang-prereqs/
+(python2) [root@localhost sbx_nxos]# cd /root/sbx_nxos/learning_labs/yang/yang-prereqs/
 (python2) [root@localhost yang-prereqs]#
 ```
 
@@ -149,7 +149,7 @@ Just like we saw in Part 1, these packages are freely available for download  at
 For the lab, these RPMs are downloaded and available in the `nxos_rpms` directory. Validate this by navigating to the directory and listing it:
 
 ``` 
-(python2) [root@localhost ~]# cd /root/sbx_nxos/yang/nxos_rpms/
+(python2) [root@localhost ~]# cd /root/sbx_nxos/learning_labs/yang/nxos_rpms/
 (python2) [root@localhost nxos_rpms]# 
 (python2) [root@localhost nxos_rpms]# ls -l
 total 64272
@@ -168,7 +168,7 @@ Next copy the `mtx-infra-*`, `mtx-device-*`, `mtx-netconf-agent-*`, and OpenConf
 Log into the leaf devices and execute the following copy commands:
 
 ``` 
-nx-osv9000-3# copy scp://root@10.10.20.20/root/sbx_nxos/yang/nxos_rpms/mtx-infra-1.0.0-r1705191346.x86_64.rpm bootflash: vrf management 
+nx-osv9000-3# copy scp://root@10.10.20.20/root/sbx_nxos/learning_labs/yang/nxos_rpms/mtx-infra-1.0.0-r1705191346.x86_64.rpm bootflash: vrf management 
 The authenticity of host '10.10.20.20 (10.10.20.20)' can't be established.
 ECDSA key fingerprint is SHA256:IZJVFckeMZy8BIdcqaFRl5gFxs7LTD8L5Uu7XvvJVmo.
 Are you sure you want to continue connecting (yes/no)? yes
@@ -181,14 +181,14 @@ Copy complete, now saving to disk (please wait)...
 
 
 ```
-nx-osv9000-3# copy scp://root@10.10.20.20/root/sbx_nxos/yang/nxos_rpms/mtx-device-7_0_3_I6_1.1.0.0-r1705191346.x86_64.rpm bootflash: vrf management 
+nx-osv9000-3# copy scp://root@10.10.20.20/root/sbx_nxos/learning_labs/yang/nxos_rpms/mtx-device-7_0_3_I6_1.1.0.0-r1705191346.x86_64.rpm bootflash: vrf management 
 root@10.10.20.20's password: 
 mtx-device-7_0_3_I6_1.1.0.0-r1705191346.x86_64.rpm                                                                                  100%   15MB   1.8MB/s   00:08    
 Copy complete, now saving to disk (please wait)...
 ```
 
 ```
-nx-osv9000-3# copy scp://root@10.10.20.20/root/sbx_nxos/yang/nxos_rpms/mtx-netconf-agent-1.0.1-r1705191346.x86_64.rpm bootflash: vrf management 
+nx-osv9000-3# copy scp://root@10.10.20.20/root/sbx_nxos/learning_labs/yang/nxos_rpms/mtx-netconf-agent-1.0.1-r1705191346.x86_64.rpm bootflash: vrf management 
 root@10.10.20.20's password: 
 mtx-netconf-agent-1.0.1-r1705191346.x86_64.rpm                                                                                      100% 2855KB   2.8MB/s   00:01    
 Copy complete, now saving to disk (please wait)...
@@ -196,7 +196,7 @@ Copy complete, now saving to disk (please wait)...
 
 
 ``` 
-nx-osv9000-3# copy scp://root@10.10.20.20/root/sbx_nxos/yang/nxos_rpms/mtx-openconfig* bootflash: vrf management 
+nx-osv9000-3# copy scp://root@10.10.20.20/root/sbx_nxos/learning_labs/yang/nxos_rpms/mtx-openconfig* bootflash: vrf management 
 root@10.10.20.20's password: 
 mtx-openconfig-bgp-7_0_3_I6_1.1.0.0-r1705170158.x86_64.rpm                                                                          100%   20MB   5.0MB/s   00:04    
 mtx-openconfig-if-ip-7_0_3_I6_1.1.0.0-r1705170202.x86_64.rpm                                                                        100%   10MB   5.1MB/s   00:02    
@@ -341,7 +341,7 @@ To construct the XML string needed, use `pyang` to visualize the `openconfig-int
 Navigate to the directory where the YANG modules have been downloaded:
 
 ``` 
-(python2) [root@localhost yang]# cd /root/sbx_nxos/yang/yang/vendor/cisco/nx/7.0-3-I6-1/                                                                              
+(python2) [root@localhost yang]# cd /root/sbx_nxos/learning_labs/yang/yang/vendor/cisco/nx/7.0-3-I6-1/                                                                              
 (python2) [root@localhost 7.0-3-I6-1]# ls -l
 total 4432
 -rwxr-xr-x. 1 root root    2153 Aug  3 14:08 check-models.sh
@@ -490,7 +490,7 @@ add_oc_interface = """<config>
 Now navigate to the sample code directory `03-yang` and run the `add_oc_loopback.py` script to add new loopback interfaces to the the switches **nx-osv9000-3** and **nx-osv9000-4**
 
 ``` 
-(python2) [root@localhost 03-yang]# cd /root/sbx_nxos/yang/03-yang/
+(python2) [root@localhost 03-yang]# cd /root/sbx_nxos/learning_labs/yang/03-yang/
 (python2) [root@localhost 03-yang]# python add_oc_loopback.py 
 
 Now adding IP address 10.103.1.1 to interface Loopback103 on device (nx-osv9000-3) 172.16.30.103...
@@ -563,7 +563,7 @@ As before, use the `pyang` utility, to build an understanding about the OpenConf
 Navigate to the repository containing the YANG Nexus models:
 
 ``` shell
-(python2) [root@localhost 01-yang]# cd /root/sbx_nxos/yang/yang/vendor/cisco/nx/7.0-3-I6-1/
+(python2) [root@localhost 01-yang]# cd /root/sbx_nxos/learning_labs/yang/yang/vendor/cisco/nx/7.0-3-I6-1/
 (python2) [root@localhost 7.0-3-I6-1]# 
 
 ```
@@ -621,7 +621,7 @@ Navigate to the sample code directory `03-yang`. This contains a Python script t
 Navigate back to `03-yang`:
 
 ``` 
-(python2) [root@localhost 7.0-3-I6-1]# cd /root/sbx_nxos/yang/03-yang/
+(python2) [root@localhost 7.0-3-I6-1]# cd /root/sbx_nxos/learning_labs/yang/03-yang/
 (python2) [root@localhost 03-yang]# 
 
 ```
