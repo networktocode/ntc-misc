@@ -66,8 +66,7 @@ def main():
             new_intf = add_oc_interface.format(IP_INT[device]['loopback'], IP_INT[device]['ip'])
             netconf_response = m.edit_config(target='running', config=new_intf)
             # Parse the XML response
-            print(etree.tostring(netconf_response.data, pretty_print=True))
-
+            print(netconf_response)
 
 if __name__ == '__main__':
     sys.exit(main())

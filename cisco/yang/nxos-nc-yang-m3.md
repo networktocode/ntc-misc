@@ -1,8 +1,8 @@
 # NETCONF/YANG on Nexus: Part 3 - Using OpenConfig YANG Models on Nexus Switches
 
-In the first two parts of working with NETCONF/YANG on Nexus switches, we focused on using the Cisco specific NXOS YANG model.  WE started with learning about it in Part 1 making basic changes and then how to model BGP adhering to the model in Part 2.  
+In the first two parts of working with NETCONF/YANG on Nexus switches, we focused on using the Cisco specific NXOS YANG model. We started with learning about it in Part 1, making basic changes and then how to model BGP, adhering to the model in Part 2.
 
-Now in Part 3, we will learn about the OpenConfig Working Group and how to use OpenConfig models on Nexus switches. We will install the OpenConfig models on the leaf switches and use it to advertise a network over BGP from the leaf devices, just like we did with the NXOS model in Part 2.
+Now in Part 3, we will learn about the OpenConfig Working Group and how to use OpenConfig models on Nexus switches. We will install the OpenConfig models on the leaf switches and use it to add loopback interfaces to the leaf nodes, just like we did in part 1.
 
 
 ## Prerequisites
@@ -10,14 +10,96 @@ Now in Part 3, we will learn about the OpenConfig Working Group and how to use O
 The user has an understanding and knowledge of the following:
 - Complete the Introduction to YANG Data Modeling Devnet learning lab
 - Complete the Introduction to the NETCONF Protocol Devnet learning lab 
-- Complete the NETCONF/YANG on Nexus: Part 1 - Learning to use the Cisco NXOS YANG Model
-- Complete the NETCONF/YANG on Nexus: Part 2 - Configuring BGP with the Cisco NXOS YANG Model Devnet learning lab
+- **Complete** the NETCONF/YANG on Nexus: Part 1 - Learning to use the Cisco NXOS YANG Model
+- **Complete** the NETCONF/YANG on Nexus: Part 2 - Configuring BGP with the Cisco NXOS YANG Model Devnet learning lab
 - Basic Python and Ansible
 - Python's ncclient
 - Installing and using packages on Linux
 - BGP routing protocol
 
+## Ensure that dependencies are configured
 
+The lab exercises in part 3 have dependencies from part 1. If you are working on part 3 of the lab, directly after completing part 1 and 2, you can skip this section. If you are returning to a new lab session, the following steps will configure the dependencies from part 1, required for part 3.
+
+Navigate to the `yang-prereqs` directory:
+
+```shell
+(python2) [root@localhost sbx_nxos]# cd /root/sbx_nxos/yang/yang-prereqs/
+(python2) [root@localhost yang-prereqs]#
+```
+
+Execute the `devbox_setup.yml` playbook, to download the switch software, YANG models, and install the `pyang` and `ncclient` libraries, in addition to the `ntc-ansible` 3rd party Ansible module.
+
+```shell
+(python2) [root@localhost yang-prereqs]# ansible-playbook devbox_setup.yml 
+
+PLAY [SET UP YANG DEVBOX ENVIRONMENT] ******************************************
+
+TASK [setup] *******************************************************************
+ok: [10.10.20.20]
+
+TASK [INSTALL PYANG AND NCCLIENT] **********************************************
+changed: [10.10.20.20]
+
+TASK [CREATE THE NXOS RPMS DIRECTORY] ******************************************
+ok: [10.10.20.20]
+
+TASK [DOWNLOAD THE CISCO ARTIFACTORY RPMs] *************************************
+ok: [10.10.20.20] => (item=https://devhub.cisco.com/artifactory/open-nxos-agents/7.0-3-I6-1/x86_64/mtx-device-7_0_3_I6_1.1.0.0-r1705191346.x86_64.rpm)
+ok: [10.10.20.20] => (item=https://devhub.cisco.com/artifactory/open-nxos-agents/7.0-3-I6-1/x86_64/mtx-infra-1.0.0-r1705191346.x86_64.rpm)
+ok: [10.10.20.20] => (item=https://devhub.cisco.com/artifactory/open-nxos-agents/7.0-3-I6-1/x86_64/mtx-netconf-agent-1.0.1-r1705191346.x86_64.rpm)
+ok: [10.10.20.20] => (item=https://devhub.cisco.com/artifactory/open-nxos-agents/7.0-3-I6-1/x86_64/mtx-openconfig-bgp-7_0_3_I6_1.1.0.0-r1705170158.x86_64.rpm)
+ok: [10.10.20.20] => (item=https://devhub.cisco.com/artifactory/open-nxos-agents/7.0-3-I6-1/x86_64/mtx-openconfig-if-ip-7_0_3_I6_1.1.0.0-r1705170202.x86_64.rpm)
+ok: [10.10.20.20] => (item=https://devhub.cisco.com/artifactory/open-nxos-agents/7.0-3-I6-1/x86_64/mtx-openconfig-interfaces-7_0_3_I6_1.1.0.0-r1705190423.x86_64.rpm)
+
+TASK [CLONE THE YANG MODELS] ***************************************************
+ok: [10.10.20.20]
+
+TASK [ENSURE THAT THE NTC LIBRARY DIR IS ABSENT] *******************************
+ok: [10.10.20.20]
+
+TASK [CLONE THE NTC MODULE] ****************************************************
+changed: [10.10.20.20]
+
+TASK [UPDATE NTC CONFIG FILE] **************************************************
+changed: [10.10.20.20]
+
+PLAY RECAP *********************************************************************
+10.10.20.20                : ok=8    changed=3    unreachable=0    failed=0   
+
+(python2) [root@localhost yang-prereqs]# 
+
+```
+
+Next, run the `spine_setup.yml` playbook. This playbook will copy over the RPMS to the spine switches, install them and start the NETCONF server on the switch:
+
+``` shell
+(python2) [root@localhost yang-prereqs]# ansible-playbook spine_setup.yml 
+
+PLAY [COPY RPMS NXOS SPINES] ***************************************************
+
+TASK [SCP THE NATIVE YANG RPMS TO SPINE SWITCHES] ******************************
+ok: [172.16.30.101] => (item=mtx-device-7_0_3_I6_1.1.0.0-r1705191346.x86_64.rpm)
+ok: [172.16.30.102] => (item=mtx-device-7_0_3_I6_1.1.0.0-r1705191346.x86_64.rpm)
+ok: [172.16.30.101] => (item=mtx-infra-1.0.0-r1705191346.x86_64.rpm)
+ok: [172.16.30.102] => (item=mtx-infra-1.0.0-r1705191346.x86_64.rpm)
+ok: [172.16.30.102] => (item=mtx-netconf-agent-1.0.1-r1705191346.x86_64.rpm)
+ok: [172.16.30.101] => (item=mtx-netconf-agent-1.0.1-r1705191346.x86_64.rpm)
+
+PLAY [INSTALL THE RPMS AND START NETCONF ON THE NXOS] **************************
+
+TASK [INSTALL THE RPMS] ********************************************************
+changed: [172.16.30.101]
+changed: [172.16.30.102]
+
+PLAY RECAP *********************************************************************
+172.16.30.101              : ok=2    changed=1    unreachable=0    failed=0   
+172.16.30.102              : ok=2    changed=1    unreachable=0    failed=0   
+
+(python2) [root@localhost yang-prereqs]# 
+
+```
+Now, with the dependencies from part 1 in place, we can learn about the OpenConfig YANG model and how to work with it, to add loopback interfaces to the leaf nodes. We will begin by exploring the OpenConfig YANG models on the Nexus.
 
 ## Exploring the use of OpenConfig YANG Models on Nexus
 
@@ -252,7 +334,7 @@ Repeat the installation steps on **nx-osv9000-4** and start the NETCONF service 
 
 #### Using OpenConfig to add Loopback interfaces on the leaf switches:
 
-In Part 1, we used the Cisco NXOS YANG model to configure loopback interfaces on **nx-osv9000-1** and **nx-osv9000-2**.  Now in Part 2, we will use the OpenConfig model to configure loopback interfaces on **nx-osv9000-3** and **nx-osv9000-4**
+In Part 1, we used the Cisco NXOS YANG model to configure loopback interfaces on **nx-osv9000-1** and **nx-osv9000-2**.  Now in Part 3, we will use the OpenConfig model to configure loopback interfaces on **nx-osv9000-3** and **nx-osv9000-4**
 
 To construct the XML string needed, use `pyang` to visualize the `openconfig-interfaces` YANG model.
 
@@ -351,8 +433,6 @@ module: openconfig-interfaces
 ```
 
 The OpenConfig model for IP addressing seems to suggest that a sub-interface is involved. The sub-interface in this context refers to an `interface index`. This index is set to `0` when referencing the main interface.
-
-> For an example of a routed interface that has a sub-interface associated with it, please see the example in the appendix.
 
 Studying the tree in the file `/tmp/nxos_oc_interfaces.txt`, the nodes needed to create the loopback interface are:
 
@@ -559,7 +639,7 @@ ASN number:65534, Router ID: 192.168.0.4 for (nx-osv9000-4) 172.16.30.104
 
 ## Conclusion
 
-In Part 1, we built an understanding of the Cisco specific NXOS YANG model and used the model as a reference to retrieve and configure Nexus switches.  In Part 2, we explored the NXOS model further, specifically focusing on BGP. Finally, in Part 3, we introduced OpenConfig models and how htey differ (in structure) from the NXOS model.  Note that OpenConfig models are vendor-neutral and may not support all the vendor, or Nexus, specific features, but intends to satisfy the majority of operator use cases
+In Part 1, we built an understanding of the Cisco specific NXOS YANG model and used the model as a reference to retrieve and configure Nexus switches.  In Part 2, we explored the NXOS model further, specifically focusing on BGP. Finally, in Part 3, we introduced OpenConfig models and how they differ (in structure) from the NXOS model.  Note that OpenConfig models are vendor-neutral and may not support all the vendor, or Nexus, specific features, but intends to satisfy the majority of operator use cases
 
 In both cases, the YANG models (both native and OpenConfig) are evolving.  However, you should realize that you don't actually *work with* YANG models.  You simply need to ensure your XML strings or objects adhere to those given YANG models!
 

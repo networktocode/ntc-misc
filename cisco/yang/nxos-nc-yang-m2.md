@@ -7,11 +7,124 @@ In Part 2 of using NETCONF and YANG on Nexus switches, we will further our under
 The user has an understanding and knowledge of the following:
 - Complete the Introduction to YANG Data Modeling Devnet learning lab
 - Complete the Introduction to the NETCONF Protocol Devnet learning lab 
-- Complete the NETCONF/YANG on Nexus: Part 1 - Using the Cisco NXOS YANG Model Devnet learning lab
+- **Complete** the NETCONF/YANG on Nexus: Part 1 - Using the Cisco NXOS YANG Model Devnet learning lab
 - Basic Python and Ansible
 - Python's ncclient
 - Installing and using packages on Linux
 - BGP routing protocol
+
+
+## Ensure that dependencies are configured
+
+The lab exercises in part 2 have dependencies from part 1. If you are working on part 2 of the lab, directly after completing part 1, you can skip this section. If you are returning to a new lab session, the following steps will configure the dependencies from part 1, required for part 2.
+
+Navigate to the `yang-prereqs` directory:
+
+```shell
+(python2) [root@localhost sbx_nxos]# cd /root/sbx_nxos/yang/yang-prereqs/
+(python2) [root@localhost yang-prereqs]#
+```
+
+Execute the `devbox_setup.yml` playbook, to download the switch software, YANG models, and install the `pyang` and `ncclient` libraries, in addition to the `ntc-ansible` 3rd party Ansible module.
+
+```shell
+(python2) [root@localhost yang-prereqs]# ansible-playbook devbox_setup.yml 
+
+PLAY [SET UP YANG DEVBOX ENVIRONMENT] ******************************************
+
+TASK [setup] *******************************************************************
+ok: [10.10.20.20]
+
+TASK [INSTALL PYANG AND NCCLIENT] **********************************************
+changed: [10.10.20.20]
+
+TASK [CREATE THE NXOS RPMS DIRECTORY] ******************************************
+ok: [10.10.20.20]
+
+TASK [DOWNLOAD THE CISCO ARTIFACTORY RPMs] *************************************
+ok: [10.10.20.20] => (item=https://devhub.cisco.com/artifactory/open-nxos-agents/7.0-3-I6-1/x86_64/mtx-device-7_0_3_I6_1.1.0.0-r1705191346.x86_64.rpm)
+ok: [10.10.20.20] => (item=https://devhub.cisco.com/artifactory/open-nxos-agents/7.0-3-I6-1/x86_64/mtx-infra-1.0.0-r1705191346.x86_64.rpm)
+ok: [10.10.20.20] => (item=https://devhub.cisco.com/artifactory/open-nxos-agents/7.0-3-I6-1/x86_64/mtx-netconf-agent-1.0.1-r1705191346.x86_64.rpm)
+ok: [10.10.20.20] => (item=https://devhub.cisco.com/artifactory/open-nxos-agents/7.0-3-I6-1/x86_64/mtx-openconfig-bgp-7_0_3_I6_1.1.0.0-r1705170158.x86_64.rpm)
+ok: [10.10.20.20] => (item=https://devhub.cisco.com/artifactory/open-nxos-agents/7.0-3-I6-1/x86_64/mtx-openconfig-if-ip-7_0_3_I6_1.1.0.0-r1705170202.x86_64.rpm)
+ok: [10.10.20.20] => (item=https://devhub.cisco.com/artifactory/open-nxos-agents/7.0-3-I6-1/x86_64/mtx-openconfig-interfaces-7_0_3_I6_1.1.0.0-r1705190423.x86_64.rpm)
+
+TASK [CLONE THE YANG MODELS] ***************************************************
+ok: [10.10.20.20]
+
+TASK [ENSURE THAT THE NTC LIBRARY DIR IS ABSENT] *******************************
+ok: [10.10.20.20]
+
+TASK [CLONE THE NTC MODULE] ****************************************************
+changed: [10.10.20.20]
+
+TASK [UPDATE NTC CONFIG FILE] **************************************************
+changed: [10.10.20.20]
+
+PLAY RECAP *********************************************************************
+10.10.20.20                : ok=8    changed=3    unreachable=0    failed=0   
+
+(python2) [root@localhost yang-prereqs]# 
+
+```
+
+Next, run the `spine_setup.yml` playbook. This playbook will copy over the RPMS to the spine switches, install them and start the NETCONF server on the switch:
+
+``` shell
+(python2) [root@localhost yang-prereqs]# ansible-playbook spine_setup.yml 
+
+PLAY [COPY RPMS NXOS SPINES] ***************************************************
+
+TASK [SCP THE NATIVE YANG RPMS TO SPINE SWITCHES] ******************************
+ok: [172.16.30.101] => (item=mtx-device-7_0_3_I6_1.1.0.0-r1705191346.x86_64.rpm)
+ok: [172.16.30.102] => (item=mtx-device-7_0_3_I6_1.1.0.0-r1705191346.x86_64.rpm)
+ok: [172.16.30.101] => (item=mtx-infra-1.0.0-r1705191346.x86_64.rpm)
+ok: [172.16.30.102] => (item=mtx-infra-1.0.0-r1705191346.x86_64.rpm)
+ok: [172.16.30.102] => (item=mtx-netconf-agent-1.0.1-r1705191346.x86_64.rpm)
+ok: [172.16.30.101] => (item=mtx-netconf-agent-1.0.1-r1705191346.x86_64.rpm)
+
+PLAY [INSTALL THE RPMS AND START NETCONF ON THE NXOS] **************************
+
+TASK [INSTALL THE RPMS] ********************************************************
+changed: [172.16.30.101]
+changed: [172.16.30.102]
+
+PLAY RECAP *********************************************************************
+172.16.30.101              : ok=2    changed=1    unreachable=0    failed=0   
+172.16.30.102              : ok=2    changed=1    unreachable=0    failed=0   
+
+(python2) [root@localhost yang-prereqs]# 
+
+```
+Finally, navigate to the `01-yang` directory and execute the loopback creation script. This will add interfaces `loopback101` and `loopback102` on `nx-osv9000-1` and `nx-osv9000-2` respectively.
+
+``` shell
+(python2) [root@localhost yang-prereqs]# cd /root/sbx_nxos/yang/01-yang
+
+(python2) [root@localhost 01-yang]# python add_loopback_full.py 
+
+Now adding IP address 10.101.1.1/24 to intf Loopback101 on device (nx-osv9000-1) 172.16.30.101...
+
+<?xml version="1.0" encoding="UTF-8"?>
+<rpc-reply xmlns:if="http://www.cisco.com/nxos:1.0:if_manager" xmlns:nfcli="http://www.cisco.com/nxos:1.0:nfcli" xmlns:nxos="http://www.cisco.com/nxos:1.0" xmlns:vlan_mgr_cli="http://www.cisco.com/nxos:1.0:vlan_mgr_cli" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="urn:uuid:d1a93f52-4d02-4f27-8a39-afa6cd64c3b6">
+    <ok/>
+</rpc-reply>
+
+
+Now adding IP address 10.102.1.2/24 to intf Loopback102 on device (nx-osv9000-2) 172.16.30.102...
+
+<?xml version="1.0" encoding="UTF-8"?>
+<rpc-reply xmlns:if="http://www.cisco.com/nxos:1.0:if_manager" xmlns:nfcli="http://www.cisco.com/nxos:1.0:nfcli" xmlns:nxos="http://www.cisco.com/nxos:1.0" xmlns:vlan_mgr_cli="http://www.cisco.com/nxos:1.0:vlan_mgr_cli" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="urn:uuid:7e25c6c4-33cc-434f-bc5b-8e244f899787">
+    <ok/>
+</rpc-reply>
+
+(python2) [root@localhost 01-yang]# 
+
+
+```
+
+Now, with the configurations from part 1 in place, we can learn about the BGP YANG model and how to work with it to advertise prefixes, in this part. We will begin by configuring a baseline BGP configuration across our network topology.
+
 
 
 ## Using Ansible to Setup a Baseline BGP Configuration
@@ -47,12 +160,9 @@ drwxr-xr-x. 2 root root   31 Jun  9 14:23 switch_admin
 
 To run the playbook, we first need to define the switch credentials as environment variables so that Ansible can properly login to each device.
 
-Enter the following two commands on the devbox:
-
+This is done by sourcing the environment variable file `.ansible-env` within that directory
 ``` shell
-
-(python2) [root@localhost ansible-playbooks]# export ANSIBLE_NET_USERNAME=admin
-(python2) [root@localhost ansible-playbooks]# export ANSIBLE_NET_PASSWORD=admin
+(python2) [root@localhost ansible-playbooks]# source .ansible_env
 ```
 
 The playbook consists of four plays to deploy L3 and BGP configurations on the switches.  They are as follows:
@@ -147,6 +257,8 @@ PLAY RECAP *********************************************************************
 ```
 > Note: The output is truncated for readability.
 
+
+**IMPORTANT**: Sometimes the playbooks time out in the sandbox environment. If you run into this, please rerun the playbook.
 
 #### Verifying the BGP Configuration
 
@@ -424,6 +536,8 @@ The BGP router-id for (nx-osv-9000-2) 172.16.30.102 is 192.168.0.2
 
 In Part 1, you added interfaces `loopback 101` and  `loopback 102` to switches **nx-osv9000-1** and **nx-osv9000-2** respectively. You will now advertise those subnets over BGP.
 
+> Please see the section about configuring part 1 dependencies at the beginning of this lab.
+
 Use the `pyang` `tree-path` again to visualize the model for BGP prefixes.
 
 Ensure you're in the `/root/sbx_nxos/yang/yang/vendor/cisco/nx/7.0-3-I6-1/`  directory:
@@ -656,3 +770,5 @@ nx-osv9000-4#
 ```
 
 You can also confirm that the newly advertised prefixes are also visible from the **nx-osv9000-3**.
+
+This brings us to the end of part 2. In the next part, we will learn about the OpenConfig YANG model implementation on the Nexus.

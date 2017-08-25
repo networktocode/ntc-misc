@@ -63,17 +63,17 @@ def main():
                              password=PASS, hostkey_verify=False,
                              device_params={'name': 'nexus'},
                              look_for_keys=False, allow_agent=False) as m:
-            
-            # Add the loopback interface 
+
+            # Add the loopback interface
             print("\nNow adding IP address {} to intf {} on device {} {}...\n".  format(LOOPBACK_IP[device]['ip'],
                               LOOPBACK_IP[device]['name'], DEVICE_NAMES[device],
                               device))
-            
+
             new_ip = add_ip_interface.format(LOOPBACK_IP[device]['loopback'], LOOPBACK_IP[device]['ip'])
             netconf_response = m.edit_config(target='running', config=new_ip)
             # Parse the XML response
-            print(etree.tostring(netconf_response.data, pretty_print=True))
-                
+            print(netconf_response)
+
 
 if __name__ == '__main__':
     sys.exit(main())

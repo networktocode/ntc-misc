@@ -1,10 +1,14 @@
 # NETCONF/YANG on Nexus: Part 1 - Learning to use the Cisco NXOS YANG Model
 
-Did you know that a Nexus switch can be represented using one more data structures?  More specifically, a Nexus switch's configuration and operational state can be represented in various data formats such as JSON and XML, but this data must adhere to the data models that the Nexus switch supports.  In this module, we'll walk through the various types of models supported and take a look at how we communicate and automate Nexus switches using data that adheres to those models!  Let's get started.
+Did you know that a Nexus switch can be represented using one or more data structures?  More specifically, a Nexus switch's configuration and operational state can be represented in various data formats such as JSON and XML, but this data must adhere to the data models that the Nexus switch supports.  In this module, we'll walk through the various types of models supported and take a look at how we communicate and automate Nexus switches using data that adheres to those models!  Let's get started.
 
 You should know by now that data modeling provides a means for defining the schema supported by devices, e.g. configuration and operational state syntax and semantics, and the most pervasive modeling language for networking devices is called YANG--we're focused on describing the different YANG models supported by Nexus in this module! 
 
-From a hands-on perspective in this lab, you'll view and navigate a Cisco specific Nexus model and in Part 2, you'll continue to use this model building out a L3 switch fabric, and finally in Part 3, you'll use OpenConfig YANG data models.  Additionally, while utilizing XML data that adheres to those models, you'll configure Nexus switches using the NETCONF programmable interface.
+Note that the Nexus switches have support for a native, Cisco NXOS specific YANG model and various OpenConfig YANG models. As you'll see in this module, the Cisco specific model is a single model that accounts for all features, but OpenConfig models are more concise in that they are purpose-built for specific features.
+
+While we're only covering NETCONF and YANG models in module, you should also realize that from a programmabilty standpoint, this is independent from the NX-API CLI and NX-API Object Model APIs (although the object model API supports Cisco specific YANG model). For additional information refer to learning labs on those topics. 
+
+From a hands-on perspective in this lab, you'll view and navigate the Cisco specific Nexus model and in Part 2, you'll continue to use this model building out a Layer 3 switch fabric, and finally in Part 3, you'll use OpenConfig YANG data models on Nexus switches.  Additionally, while utilizing XML data that adheres to those models, you'll configure Nexus switches using the NETCONF programmable interface.
 
 ## Prerequisites
 
@@ -25,6 +29,8 @@ The user has an understanding and knowledge of the following:
 **For an introduction to NETCONF, YANG, and ncclient please see the learning labs focused on these technologies**
 
 ## Preparing the Switches
+
+**STOP:** You should ensure that the NXOS Sandbox lab is reserved before starting as it takes a few minutes to get started!
 
 ### Copying the Installation Packages to the Nexus Switches
 
@@ -52,7 +58,36 @@ As with the Cisco specific model (**mtx-device-model**), Common Model components
 
 Finally, three agent packages are available: NETCONF, RESTConf and gRPC. At least one agent must be installed in order to have access to the modeled NX-OS interface. For our lab, we will be working with the NETCONF agent exclusively.
 
-For this lab, the required software has already been downloaded and placed in the `/root/sbx_nxos/yang/nxos_rpms/` directory.
+
+Login to the devbox to download the necessary packages. Run the following ansible playbook from the `yang-prereqs` directory:
+
+``` shell
+(python2) [root@localhost sbx_nxos]# cd /root/sbx_nxos/yang/yang-prereqs
+(python2) [root@localhost yang-prereqs]# ansible-playbook get_rpms.yml
+PLAY [ENSURE THAT THE NXOS RPMS ARE AVAILABLE] *********************************
+
+TASK [setup] *******************************************************************
+ok: [10.10.20.20]
+
+TASK [CREATE THE NXOS RPMS DIRECTORY] ******************************************
+changed: [10.10.20.20]
+
+TASK [DOWNLOAD THE CISCO ARTIFACTORY RPMs] *************************************
+changed: [10.10.20.20] => (item=https://devhub.cisco.com/artifactory/open-nxos-agents/7.0-3-I6-1/x86_64/mtx-device-7_0_3_I6_1.1.0.0-r1705191346.x86_64.rpm)
+changed: [10.10.20.20] => (item=https://devhub.cisco.com/artifactory/open-nxos-agents/7.0-3-I6-1/x86_64/mtx-infra-1.0.0-r1705191346.x86_64.rpm)
+changed: [10.10.20.20] => (item=https://devhub.cisco.com/artifactory/open-nxos-agents/7.0-3-I6-1/x86_64/mtx-netconf-agent-1.0.1-r1705191346.x86_64.rpm)
+changed: [10.10.20.20] => (item=https://devhub.cisco.com/artifactory/open-nxos-agents/7.0-3-I6-1/x86_64/mtx-openconfig-bgp-7_0_3_I6_1.1.0.0-r1705170158.x86_64.rpm)
+changed: [10.10.20.20] => (item=https://devhub.cisco.com/artifactory/open-nxos-agents/7.0-3-I6-1/x86_64/mtx-openconfig-if-ip-7_0_3_I6_1.1.0.0-r1705170202.x86_64.rpm)
+changed: [10.10.20.20] => (item=https://devhub.cisco.com/artifactory/open-nxos-agents/7.0-3-I6-1/x86_64/mtx-openconfig-interfaces-7_0_3_I6_1.1.0.0-r1705190423.x86_64.rpm)
+
+PLAY RECAP *********************************************************************
+10.10.20.20                : ok=3    changed=2    unreachable=0    failed=0   
+
+
+
+```
+
+This playbook creates a directory `/root/sbx_nxos/yang/nxos_rpms/` and downloads the required software.
 
 Take a look by navigating within the devbox.
 
@@ -77,7 +112,7 @@ You'll be using SCP to copy the files from the devbox directly to each switch.
 
 ``` shell
 
-# Copy the programmable interface infrastructure packages:
+### Copy the programmable interface infrastructure packages:
 
 nx-osv9000-1#copy scp://root@10.10.20.20/root/sbx_nxos/yang/nxos_rpms/mtx-device-7_0_3_I6_1.1.0.0-r1705191346.x86_64.rpm bootflash: vrf management
 
@@ -213,6 +248,8 @@ bash-4.2#
 
 ```
 
+> For any given technology, more than one model can be installed on the device (as we will see, when we learn about OpenConfig YANG models in Part 3). Unique namespaces are used to distinguish the different installed models.  For example, you can install the OpenConfig BGP model and have the NXOS model that supports BGP installed at the same time.
+
 Next install the NETCONF agent on both **nx-osv9000-1** and **nx-osv9000-2**:
 
 ``` shell
@@ -281,43 +318,66 @@ bash-4.2#
 
 Now the NETCONF agent has been started, it will listen on TCP/830 on the switches even though it's still using SSH as its transport protocol.
 
-## Preparing the Control Machine (devbox)
+> You need to start the netconf server only once. The server is automatically started for subsequent device reboots.
 
-> (Note: We can eliminate this section if it makes sense not to include,by pre-installing the library. The learning labs on YANG and NETCONF indicate that the software reqs are pre-installed )
+## Preparing the Control Machine (devbox)
 
 The control machine (devbox) is where we will use a NETCONF client, allowing us to interact with the YANG models through the NETCONF agent interface. 
 
-### Ensure you have the ncclient library
+### The ncclient Python Library
 
 [`ncclient`](https://ncclient.readthedocs.io/en/latest/) is an opensource Python-based NETCONF client, that maps the XML-encoded nature of NETCONF to Python constructs and idioms, and vice versa.  It's the most popular and common way in Python to write scripts communicating with NETCONF-enabled devices.
 
-While in the `sbx_nxos` directory on the devbox, execute the following command to ensure the `ncclient` is installed:
 
-```
-(python2) [root@localhost sbx_nxos]# pip list | grep "ncclient"
-
-ncclient (0.5.3)
-```
-
-You'll want to ensure you see `ncclient` in the output.
-
-If you don't have it, you can install using the command `pip install ncclient`.
-
-
-### Ensure you have the pyang library
+### The pyang Python library
 
 The [`pyang`](http://www.yang-central.org/twiki/pub/Main/YangTools/pyang.1.html) Python library is an opensource YANG validator and general tool to view and also convert models to different representations. 
 
 We will use `pyang` as a learning tool to help visualize the YANG models for this lab.
 
+
+### Installing the library files
+
+We will now install `ncclient` and `pyang`. Navigate to the `yang-prereqs` directory
+
 ``` shell
+(python2) [root@localhost nxos_rpms]# cd /root/sbx_nxos/yang/yang-prereqs
+(python2) [root@localhost yang-prereqs]#
+```
+Execute pip to install the requirements
 
-(python2) [root@localhost sbx_nxos]# pip list | grep "pyang"
+``` shell
+(python2) [root@localhost yang-prereqs]# pip install -r yang-requirements.txt 
+Collecting ncclient (from -r yang-requirements.txt (line 1))
+  Downloading ncclient-0.5.3.tar.gz (63kB)
+    100% |████████████████████████████████| 71kB 771kB/s 
+Collecting pyang (from -r yang-requirements.txt (line 2))
+  Downloading pyang-1.7.3-py2.py3-none-any.whl (326kB)
+    100% |████████████████████████████████| 327kB 2.0MB/s 
+Requirement already satisfied: setuptools>0.6 in /root/sbx_nxos/venv/python2/lib/python2.7/site-packages (from ncclient->-r yang-requirements.txt (line 1))
+Requirement already satisfied: paramiko>=1.15.0 in /root/sbx_nxos/venv/python2/lib/python2.7/site-packages (from ncclient->-r yang-requirements.txt (line 1))
+Collecting lxml>=3.3.0 (from ncclient->-r yang-requirements.txt (line 1))
+  Downloading lxml-3.8.0-cp27-cp27m-manylinux1_x86_64.whl (6.8MB)
+    100% |████████████████████████████████| 6.8MB 139kB/s 
+Requirement already satisfied: six in /root/sbx_nxos/venv/python2/lib/python2.7/site-packages (from ncclient->-r yang-requirements.txt (line 1))
+Requirement already satisfied: pyasn1>=0.1.7 in /root/sbx_nxos/venv/python2/lib/python2.7/site-packages (from paramiko>=1.15.0->ncclient->-r yang-requirements.txt (line 1))
+Requirement already satisfied: cryptography>=1.1 in /root/sbx_nxos/venv/python2/lib/python2.7/site-packages (from paramiko>=1.15.0->ncclient->-r yang-requirements.txt (line 1))
+Requirement already satisfied: idna>=2.1 in /root/sbx_nxos/venv/python2/lib/python2.7/site-packages (from cryptography>=1.1->paramiko>=1.15.0->ncclient->-r yang-requirements.txt (line 1))
+Requirement already satisfied: asn1crypto>=0.21.0 in /root/sbx_nxos/venv/python2/lib/python2.7/site-packages (from cryptography>=1.1->paramiko>=1.15.0->ncclient->-r yang-requirements.txt (line 1))
+Requirement already satisfied: enum34 in /root/sbx_nxos/venv/python2/lib/python2.7/site-packages (from cryptography>=1.1->paramiko>=1.15.0->ncclient->-r yang-requirements.txt (line 1))
+Requirement already satisfied: ipaddress in /root/sbx_nxos/venv/python2/lib/python2.7/site-packages (from cryptography>=1.1->paramiko>=1.15.0->ncclient->-r yang-requirements.txt (line 1))
+Requirement already satisfied: cffi>=1.7 in /root/sbx_nxos/venv/python2/lib/python2.7/site-packages (from cryptography>=1.1->paramiko>=1.15.0->ncclient->-r yang-requirements.txt (line 1))
+Requirement already satisfied: pycparser in /root/sbx_nxos/venv/python2/lib/python2.7/site-packages (from cffi>=1.7->cryptography>=1.1->paramiko>=1.15.0->ncclient->-r yang-requirements.txt (line 1))
+Building wheels for collected packages: ncclient
+  Running setup.py bdist_wheel for ncclient ... done
+  Stored in directory: /root/.cache/pip/wheels/86/30/68/153d65b60834981c1960737f3f2de488574ba5355fe1329558
+Successfully built ncclient
+Installing collected packages: lxml, ncclient, pyang
+Successfully installed lxml-3.8.0 ncclient-0.5.3 pyang-1.7.3
+(python2) [root@localhost yang-prereqs]# 
 
-pyang (1.7.3)
 ```
 
-If you don't have it, you can install using the command `pip install pyang`.
 
 ## Initial Interactions with the Cisco NXOS YANG Model
 
@@ -425,9 +485,10 @@ Let's use `pyang`to visualize this model.
 
 First, it's worth noting that all supported models for Nexus are posted to GitHub at https://github.com/YangModels/yang[https://github.com/YangModels/yang] and specifically within the `cisco/nx` sub-directory, which we'll see below.
 
-On the devbox, clone this repository:
+On the devbox, navigate to the `yang` directory and clone this repository:
 
 ``` shell
+(python2) [root@localhost yang]# cd /root/sbx_nxos/yang
 (python2) [root@localhost yang]# git clone https://github.com/YangModels/yang
 Cloning into 'yang'...
 remote: Counting objects: 8057, done.
@@ -522,7 +583,7 @@ module: Cisco-NX-OS-device
 
 Let's now "use" this model and try and collect the serial number of the devices.  By using this model, it simply means we are going to pass an XML object to the device that adheres to this YANG model.
 
-As we saw in the devnet learning lab for YANG, we can "interact" with this YANG model by constructing an equivalent `XML` filter and using that with the `ncclient` python library over the NETCONF protocol.
+As we saw in the devnet learning lab for YANG, we can "interact" with this YANG model by constructing an equivalent `XML` filter and using that with the `ncclient` Python library over the NETCONF protocol.
 
 Based on the tree output above, our `xml` filter would look like this
 
