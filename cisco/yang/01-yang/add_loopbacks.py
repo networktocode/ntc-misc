@@ -46,8 +46,7 @@ def main():
             print("\nNow adding Loopback99 device {} {}...\n".format(DEVICE_NAMES[device], device))
             netconf_response = m.edit_config(target='running', config=loopback_add)
             # Parse the XML response
-            print(etree.tostring(netconf_response.data, pretty_print=True))
-                
+            print(netconf_response)
 
 if __name__ == '__main__':
     sys.exit(main())
