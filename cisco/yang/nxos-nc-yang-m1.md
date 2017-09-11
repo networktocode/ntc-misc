@@ -755,7 +755,7 @@ In the sample code directory `01-yang`, execute the `update_hostname.py` script.
 
 
 ``` 
-(python2) [root@localhost 01-yang]# cd /root/sbx_root/yang/01-yang
+(python2) [root@localhost 01-yang]# cd /root/sbx_nxos/learning_labs/yang/01-yang
 (python2) [root@localhost 01-yang]# python update_hostname.py 
 <?xml version="1.0" encoding="UTF-8"?>
 <rpc-reply xmlns:if="http://www.cisco.com/nxos:1.0:if_manager" xmlns:nfcli="http://www.cisco.com/nxos:1.0:nfcli" xmlns:nxos="http://www.cisco.com/nxos:1.0" xmlns:vlan_mgr_cli="http://www.cisco.com/nxos:1.0:vlan_mgr_cli" xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="urn:uuid:2637d9ec-b8c6-46f8-9ebc-c96134ba5258">
