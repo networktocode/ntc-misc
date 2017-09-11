@@ -117,7 +117,21 @@ nx-osv9000-1(conf-tm-sensor)#
 
 ```
 
-Here, we are creating a sensor group identified by the number `100`. Within this we define the data source to be `NX-API`. As noted in the introduction, the telemetry data on the devices are gleaned either through the DME (using  modeled data) or the NX-API (using show commands). The NX-API is typically used for telemetry data not yet supported by the Data Modeling Engine of the NX-OS. 
+
+Here, we are creating a sensor group identified by the number `100`. Within this we define the data source to be `NX-API`. As noted in the introduction, the telemetry data on the devices are gleaned either through the DME (using  modeled data) or the NX-API (using show commands). While any NX-API show commands, that support JSON output can be used, for configuring the sensors, it is highly recommended to only use show commands if that telemetry data cannot be gleaned from the DME, due to processing overheads of using a show command. 
+
+> Note: You can identify whether a particular show command supports JSON output by `piping` the output of the show command to json on the nxos command line. 
+
+``` shell
+nx-osv9000-1# show system resources | json
+{"load_avg_1min": "1.50", "load_avg_5min": "1.35", "load_avg_15min": "1.12", "processes_total": "596", "processes_running": "5", "cpu_state_user": "5.05", "cpu_state_kernel": "10.11", "cpu_s
+tate_idle": "84.83", "TABLE_cpu_usage": {"ROW_cpu_usage": [{"cpuid": "0", "user": "4.16", "kernel": "7.29", "idle": "88.54"}, {"cpuid": "1", "user": "7.40", "kernel": "11.11", "idle": "81.48
+"}]}, "memory_usage_total": "8165260", "memory_usage_used": "5946888", "memory_usage_free": "2218372", "current_memory_status": "OK"}
+nx-osv9000-1# 
+
+```
+
+
 
 For our first sensor, we are going to collect the data from the output of `show system resources`. Thus, the command is specified as a `path` within the sensor-group.
 
@@ -196,7 +210,9 @@ Here, we will run a basic HTTP listener (listening on port 8888, per our collect
 First, install the Python `flask` library need by the listener:
 
 ``` shell
-(python2) [root@localhost telemetry]# pip install flask
+
+(python2) [root@localhost telemetry]# pip install -r requirements.txt
+
 Collecting flask
   Downloading Flask-0.12.2-py2.py3-none-any.whl (83kB)
     100% |████████████████████████████████| 92kB 827kB/s 
