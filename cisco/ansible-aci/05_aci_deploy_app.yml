@@ -148,7 +148,7 @@
         tenant: "{{ tenant }}"
         ap: "{{ ap }}"
         epg: "{{ item.epg }}"
-        bd: "{{ bd }}"
+        bd: "{{ item.bd }}"
         descr: "EPG Created Using Ansible"
       with_items: "{{ epgs }}"
       tags: epg
@@ -163,9 +163,10 @@
         tenant: "{{ tenant }}"
         ap: "{{ ap }}"
         epg: "{{ item.epg }}"
-        domain: "vmm"
-        domain_profile: "aci_ansible_lab"
-        vlan_mode: "static"
+        domain: "aci_ansible_lab"
+        domain_type: "vmm"
+        vm_provider: "vmware"
+        encap_mode: "auto"
         encap: "{{ item.encap }}"
       with_items: "{{ epgs }}"
       tags: epg
