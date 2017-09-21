@@ -80,8 +80,8 @@
         entry: "{{ item.entry }}"
         ether_type: "ip"
         ip_protocol: "{{ item.protocol }}"
-        dest_port_start: "{{ item.port }}"
-        dest_port_end: "{{ item.port }}"
+        dst_port_start: "{{ item.port }}"
+        dst_port_end: "{{ item.port }}"
       with_items: "{{ filters }}"
       tags: filter, contract
 
