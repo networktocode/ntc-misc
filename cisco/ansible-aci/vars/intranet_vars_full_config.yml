@@ -1,5 +1,5 @@
 ---
-tenant: jm_10018
+tenant: CHANGEME
 vrf: "prod_vrf"
 bridge_domains:
   - bd: "prod_bd"
