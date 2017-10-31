@@ -1,4 +1,4 @@
-Automating Cisco ACI with Ansible
+# Automating Cisco ACI with Ansible
 
 Ansible has quickly become a popular platform for network engineers to get started with network automation and eliminate repetitive day to day tasks.  There have been Ansible plug-ins (in the form of modules) for Cisco IOS, NX-OS, and IOS-XR for quite some time, but only recently has support been added to Ansible for Cisco Application Centric Infrastructure (ACI).
 
@@ -302,7 +302,7 @@ Interested to learn more about using Ansible to automate ACI?  Check out these D
   * List labs
 
 
-About the Author
+### About the Author
 
 Jacob McGill is a network automation engineer at [Network to Code](http://networktocode.com), a network automation solutions provider that provides network automation training and professional services.  He spends his time helping customers automate their networks using tools including like Python and Ansible. Jacob is also an Ansible developer who's written and contributed to many of the ACI modules that were released in 2.4. Feel free to reach out to Jacob at jacob@networktocode.com 
 
