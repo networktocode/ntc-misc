@@ -1,4 +1,4 @@
-Never Console into your Nexus Switches Again using POAP
+# Never Console into your Nexus Switches Again using POAP
 
 If you were to tell your cloud or server admin friends that in this day and age you have to manually configure every switch as you un-box and deploy them, you'll probably get expressions that range from sympathy to disdain. 
 
@@ -43,7 +43,7 @@ Then, the switch downloads the desired configuration and copies it to the startu
 
 At this point the switch has downloaded the desired image and configuration. It then reboots into the new image. The desired configuration loads into running from the startup. With no human intervention (other than switching it on), the switch has automatically been provisioned with the correct image and the desired configuration. So next time you run into your cloud admin friend, hold your head high! Zero touch provisioning...pffft... of course our network can do it.
 
-About the Author
+### About the Author
 
 Ajay Chenempara is a senior network automation engineer at [Network to Code](http://networktocode.com), a network automation solutions provider that provides network automation training and professional services.  Ajay is the lead instructor at Network to Code while also assisting with automation related projects.  He's usually in front of customers helping them learn different tools, APIs, and technologies ranging from Python and Ansible to more complex CI/CD pipelines and how they can be leveraged within the context of network automation.  Ajay can be reached at ajay@networktocode.com.
 
